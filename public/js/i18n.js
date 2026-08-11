@@ -119,13 +119,20 @@ const T = {
   }
 };
 
-// Detect language: ?lang= param > navigator > 'es'
+// Detect language: localStorage > ?lang= param > navigator > 'es'
 const _params = new URLSearchParams(window.location.search);
-const LANG = _params.get('lang') || (navigator.language || '').slice(0, 2);
-const i18n = T[LANG] || T['es'];
+let LANG = localStorage.getItem('piku_lang') || _params.get('lang') || (navigator.language || '').slice(0, 2);
+if (!T[LANG]) LANG = 'es';
+const i18n = T[LANG];
 
 // Helper to translate a key
 function t(key) { return i18n[key] || T['es'][key] || key; }
+
+function toggleLanguage() {
+  const newLang = LANG === 'es' ? 'en' : 'es';
+  localStorage.setItem('piku_lang', newLang);
+  window.location.reload();
+}
 
 // Auto-apply data-i18n attributes on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -141,4 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-ph'));
   });
+  
+  const toggleBtn = document.getElementById('lang-toggle-text');
+  if (toggleBtn) {
+    toggleBtn.innerText = LANG === 'es' ? 'EN' : 'ES';
+  }
 });

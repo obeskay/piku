@@ -10,6 +10,11 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" onerror="window.confetti=function(){}"></script>
 </head>
 <body>
+  <div style="position: absolute; top: 16px; right: 16px; z-index: 100;">
+    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 100px; width: auto;" onclick="toggleLanguage()">
+      🌐 <span id="lang-toggle-text">EN</span>
+    </button>
+  </div>
 
   <div class="app-container" style="max-width:420px;">
 
