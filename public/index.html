@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Piku</title>
+  <meta name="description" content="Open-source real-time trivia for your local network. No signup, no internet needed.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="bg-shapes">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+  </div>
+
+  <div class="app-container">
+    <h1>Piku <span class="accent">Trivia</span></h1>
+
+    <div class="badge" id="lan-badge">
+      📡 <span id="local-ip-text" class="badge-accent">…</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="btn btn-accent active" id="tab-join-btn" onclick="switchTab('join')" data-i18n="joinTab">📱 Jugar</button>
+      <button class="btn btn-green" id="tab-host-btn" onclick="switchTab('host')" data-i18n="hostTab">🖥️ Crear</button>
+    </div>
+
+    <!-- JOIN -->
+    <div class="glass-card" id="join-card">
+      <div class="input-group">
+        <label data-i18n="pinLabel">PIN</label>
+        <input type="number" id="pin-input" data-i18n-ph="pinPlaceholder" placeholder="482910" maxlength="6">
+      </div>
+      <div class="input-group">
+        <label data-i18n="nameLabel">Tu nombre</label>
+        <input type="text" id="nickname-input" data-i18n-ph="namePlaceholder" placeholder="Ej: Luna" maxlength="15">
+      </div>
+      <div class="input-group">
+        <label data-i18n="avatarLabel">Avatar</label>
+        <select id="avatar-select">
+          <option value="😎">😎</option>
+          <option value="🚀">🚀</option>
+          <option value="🔥">🔥</option>
+          <option value="👑">👑</option>
+          <option value="🍕">🍕</option>
+          <option value="🦄">🦄</option>
+          <option value="🤖">🤖</option>
+          <option value="🥑">🥑</option>
+        </select>
+      </div>
+      <button class="btn btn-accent" onclick="joinGame()" data-i18n="joinBtn">¡Entrar!</button>
+      <p id="join-error" style="color: var(--red); font-weight: 700; text-align: center; display: none;"></p>
+    </div>
+
+    <!-- HOST -->
+    <div class="glass-card" id="host-card" style="display: none;">
+      <h2 data-i18n="hostTitle">Elige trivia</h2>
+      <div class="input-group">
+        <select id="quiz-select"></select>
+      </div>
+      <button class="btn btn-green" onclick="hostGame()" data-i18n="hostStart">🚀 Crear sala</button>
+      <button class="btn btn-ghost" onclick="openCreatorModal()" data-i18n="hostCreate">➕ Nueva trivia</button>
+    </div>
+
+    <!-- QUIZ CREATOR MODAL -->
+    <div id="creator-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2 data-i18n="creatorTitle">Crear trivia</h2>
+        <div class="input-group">
+          <label data-i18n="creatorName">Nombre</label>
+          <input type="text" id="new-quiz-title" data-i18n-ph="creatorNamePh" placeholder="Ej: Noche de trivia">
+        </div>
+        <div id="questions-builder" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        <button class="btn btn-blue" onclick="addQuestionField()" data-i18n="creatorAdd">➕ Pregunta</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-green" onclick="saveCustomQuiz()" data-i18n="creatorSave" style="flex: 1;">💾 Guardar</button>
+          <button class="btn btn-ghost" onclick="closeCreatorModal()" data-i18n="creatorCancel" style="flex: 1;">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/audio.js"></script>
+  <script>
+    let localIp = 'localhost';
+
+    fetch('/api/info')
+      .then(r => r.json())
+      .then(d => {
+        localIp = d.localIp;
+        document.getElementById('local-ip-text').innerText = d.url;
+      })
+      .catch(() => {
+        document.getElementById('local-ip-text').innerText = window.location.origin;
+      });
+
+    function loadQuizList() {
+      fetch('/api/quizzes')
+        .then(r => r.json())
+        .then(quizzes => {
+          const sel = document.getElementById('quiz-select');
+          sel.innerHTML = '';
+          quizzes.forEach(q => {
+            const opt = document.createElement('option');
+            opt.value = q.id;
+            opt.innerText = `${q.title} (${q.questions.length})`;
+            sel.appendChild(opt);
+          });
+        });
+    }
+    loadQuizList();
+
+    function switchTab(tab) {
+      document.getElementById('join-card').style.display = tab === 'join' ? 'flex' : 'none';
+      document.getElementById('host-card').style.display = tab === 'host' ? 'flex' : 'none';
+      document.getElementById('tab-join-btn').classList.toggle('active', tab === 'join');
+      document.getElementById('tab-host-btn').classList.toggle('active', tab === 'host');
+    }
+
+    function joinGame() {
+      const pin = document.getElementById('pin-input').value.trim();
+      const nickname = document.getElementById('nickname-input').value.trim();
+      const avatar = document.getElementById('avatar-select').value;
+      const err = document.getElementById('join-error');
+
+      if (!pin || pin.length < 5) {
+        err.innerText = t('joinErrPin');
+        err.style.display = 'block';
+        return;
+      }
+      if (!nickname) {
+        err.innerText = t('joinErrName');
+        err.style.display = 'block';
+        return;
+      }
+      err.style.display = 'none';
+      window.location.href = `/player.html?pin=${pin}&nickname=${encodeURIComponent(nickname)}&avatar=${encodeURIComponent(avatar)}`;
+    }
+
+    function hostGame() {
+      const quizId = document.getElementById('quiz-select').value;
+      window.location.href = `/host.html?quizId=${quizId}`;
+    }
+
+    // Quiz creator
+    let customQuestions = [];
+
+    function openCreatorModal() {
+      document.getElementById('creator-modal').classList.add('active');
+      customQuestions = [];
+      document.getElementById('questions-builder').innerHTML = '';
+      addQuestionField();
+    }
+
+    function closeCreatorModal() {
+      document.getElementById('creator-modal').classList.remove('active');
+    }
+
+    function addQuestionField() {
+      const idx = customQuestions.length;
+      customQuestions.push({});
+      const w = document.createElement('div');
+      w.className = 'question-block';
+      w.innerHTML = `
+        <h4>#${idx + 1}</h4>
+        <input type="text" class="q-title" placeholder="${t('creatorQuestionPh')}">
+        <div class="opts-grid">
+          <input type="text" class="q-opt-0" placeholder="🔺" style="border-color: var(--red);">
+          <input type="text" class="q-opt-1" placeholder="🔷" style="border-color: var(--blue);">
+          <input type="text" class="q-opt-2" placeholder="🟡" style="border-color: var(--yellow);">
+          <input type="text" class="q-opt-3" placeholder="🟩" style="border-color: var(--green);">
+        </div>
+        <div class="meta-row">
+          <label>${t('creatorCorrect')}</label>
+          <select class="q-correct">
+            <option value="0">🔺</option>
+            <option value="1">🔷</option>
+            <option value="2">🟡</option>
+            <option value="3">🟩</option>
+          </select>
+          <label>${t('creatorTime')}</label>
+          <select class="q-time">
+            <option value="15">15s</option>
+            <option value="20" selected>20s</option>
+            <option value="30">30s</option>
+          </select>
+        </div>
+      `;
+      document.getElementById('questions-builder').appendChild(w);
+    }
+
+    function saveCustomQuiz() {
+      const title = document.getElementById('new-quiz-title').value.trim();
+      if (!title) return alert(t('creatorAlertTitle'));
+
+      const blocks = document.querySelectorAll('#questions-builder > div');
+      const questions = [];
+      blocks.forEach((b, i) => {
+        const qText = b.querySelector('.q-title').value.trim();
+        const o0 = b.querySelector('.q-opt-0').value.trim();
+        const o1 = b.querySelector('.q-opt-1').value.trim();
+        const o2 = b.querySelector('.q-opt-2').value.trim();
+        const o3 = b.querySelector('.q-opt-3').value.trim();
+        const correct = parseInt(b.querySelector('.q-correct').value);
+        const timeLimit = parseInt(b.querySelector('.q-time').value);
+        if (qText && o0 && o1 && o2 && o3) {
+          questions.push({ id: 'cq-' + i, question: qText, timeLimit, options: [o0, o1, o2, o3], correctIndex: correct });
+        }
+      });
+
+      if (questions.length === 0) return alert(t('creatorAlertMin'));
+
+      fetch('/api/quizzes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description: '', questions })
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          alert(t('creatorAlertOk'));
+          closeCreatorModal();
+          loadQuizList();
+          switchTab('host');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

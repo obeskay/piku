@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Piku — Host</title>
+  <meta name="description" content="Host screen for Piku trivia. Project questions, leaderboard and podium in real time.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" onerror="window.confetti=function(){}"></script>
+</head>
+<body>
+  <div class="bg-shapes">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+  </div>
+
+  <div class="app-container host-container">
+
+    <!-- LOBBY -->
+    <div id="screen-lobby" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <div class="lobby-header">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <span class="subtitle" data-i18n="hostScan">Escanea para unirte</span>
+          <span class="badge-accent" id="lan-join-url" style="font-size:1.1rem;">…</span>
+        </div>
+        <div class="pin-display">
+          <span class="pin-label" data-i18n="hostPin">PIN</span>
+          <span class="pin-code" id="pin-display">------</span>
+        </div>
+        <div class="qr-box">
+          <img id="qr-img" src="" alt="QR">
+        </div>
+      </div>
+
+      <div class="info-row">
+        <h2><span data-i18n="hostPlayers">Jugadores</span> <span id="player-count" style="color:var(--accent);">0</span></h2>
+        <button class="btn btn-green" id="start-btn" onclick="startGame()" style="width:auto;padding:12px 28px;" disabled data-i18n="hostGo">¡Empezar! 🚀</button>
+      </div>
+
+      <div class="players-grid" id="players-grid"></div>
+    </div>
+
+    <!-- QUESTION -->
+    <div id="screen-question" style="width:100%;display:none;flex-direction:column;align-items:center;gap:12px;">
+      <div class="info-row">
+        <span class="badge"><span data-i18n="hostQ">Pregunta</span> <span id="q-num">1</span>/<span id="q-total">5</span></span>
+        <span class="badge" style="color:var(--red);">⏱ <span id="timer-text">20</span></span>
+        <span class="badge"><span data-i18n="hostAnswers">Respuestas</span> <span id="ans-count">0</span>/<span id="ans-total-players">0</span></span>
+      </div>
+
+      <div class="timer-bar-container">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+
+      <div class="question-card" id="question-title">…</div>
+
+      <div class="answers-grid-host" id="answers-grid">
+        <div class="answer-card opt-0"><div class="answer-shape">▲</div><div id="opt-0-text"></div></div>
+        <div class="answer-card opt-1"><div class="answer-shape">◆</div><div id="opt-1-text"></div></div>
+        <div class="answer-card opt-2"><div class="answer-shape">●</div><div id="opt-2-text"></div></div>
+        <div class="answer-card opt-3"><div class="answer-shape">■</div><div id="opt-3-text"></div></div>
+      </div>
+
+      <div id="chart-section" style="display:none;width:100%;flex-direction:column;align-items:center;gap:16px;">
+        <div class="chart-container">
+          <div class="chart-bar-wrapper"><div class="chart-count" id="chart-count-0">0</div><div class="chart-bar bar-0" id="chart-bar-0" style="height:0%;"></div><div style="font-size:1.2rem;margin-top:4px;">▲</div></div>
+          <div class="chart-bar-wrapper"><div class="chart-count" id="chart-count-1">0</div><div class="chart-bar bar-1" id="chart-bar-1" style="height:0%;"></div><div style="font-size:1.2rem;margin-top:4px;">◆</div></div>
+          <div class="chart-bar-wrapper"><div class="chart-count" id="chart-count-2">0</div><div class="chart-bar bar-2" id="chart-bar-2" style="height:0%;"></div><div style="font-size:1.2rem;margin-top:4px;">●</div></div>
+          <div class="chart-bar-wrapper"><div class="chart-count" id="chart-count-3">0</div><div class="chart-bar bar-3" id="chart-bar-3" style="height:0%;"></div><div style="font-size:1.2rem;margin-top:4px;">■</div></div>
+        </div>
+        <button class="btn btn-accent" onclick="showLeaderboard()" style="width:auto;padding:14px 36px;" data-i18n="hostRanking">🏆 Ranking</button>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div id="screen-leaderboard" style="width:100%;display:none;flex-direction:column;align-items:center;gap:20px;">
+      <h1>🏆</h1>
+      <div class="leaderboard-list" id="leaderboard-list"></div>
+      <button class="btn btn-green" id="next-btn" onclick="nextQuestion()" style="width:auto;padding:14px 36px;" data-i18n="hostNext">Siguiente ➡️</button>
+    </div>
+
+    <!-- PODIUM -->
+    <div id="screen-podium" style="width:100%;display:none;flex-direction:column;align-items:center;gap:20px;">
+      <h1 data-i18n="hostGameOver">🎉</h1>
+      <div class="podium-container" id="podium-display"></div>
+      <button class="btn btn-accent" onclick="window.location.href='/'" style="width:auto;padding:14px 36px;" data-i18n="hostHome">🏠</button>
+    </div>
+
+    <!-- CONNECTION LOST -->
+    <div id="connection-lost" class="connection-lost" style="display:none;">
+      <div style="font-size:3rem;">📡</div>
+      <h2 data-i18n="hostDisconnected">Desconectado</h2>
+      <button class="btn btn-accent" onclick="window.location.reload()" style="width:auto;padding:12px 28px;" data-i18n="hostReconnect">🔄</button>
+    </div>
+
+  </div>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+</html>

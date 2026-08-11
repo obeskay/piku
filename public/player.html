@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Piku — Player</title>
+  <meta name="description" content="Player controller for Piku trivia. Answer in real time from your phone.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" onerror="window.confetti=function(){}"></script>
+</head>
+<body>
+
+  <div class="app-container" style="max-width:420px;">
+
+    <div class="player-header">
+      <span id="player-info-tag" style="font-weight:800;">😎</span>
+      <div class="streak-badge" id="player-streak-badge" style="display:none;">🔥 <span id="streak-val">0</span></div>
+      <span class="score" id="player-score-tag">0</span>
+    </div>
+
+    <!-- LOBBY -->
+    <div class="player-feedback" id="state-lobby">
+      <div style="font-size:3.5rem;">🎉</div>
+      <div class="feedback-title" data-i18n="playerIn">¡Listo!</div>
+      <p class="subtitle" data-i18n="playerWait">Esperando…</p>
+    </div>
+
+    <!-- PAD -->
+    <div class="player-pad" id="state-pad" style="display:none;">
+      <button class="pad-btn btn-0" onclick="submitAnswer(0)">
+        <svg class="pad-icon" viewBox="0 0 100 100" fill="white"><polygon points="50,15 90,85 10,85"/></svg>
+      </button>
+      <button class="pad-btn btn-1" onclick="submitAnswer(1)">
+        <svg class="pad-icon" viewBox="0 0 100 100" fill="white"><polygon points="50,10 90,50 50,90 10,50"/></svg>
+      </button>
+      <button class="pad-btn btn-2" onclick="submitAnswer(2)">
+        <svg class="pad-icon" viewBox="0 0 100 100" fill="white"><circle cx="50" cy="50" r="40"/></svg>
+      </button>
+      <button class="pad-btn btn-3" onclick="submitAnswer(3)">
+        <svg class="pad-icon" viewBox="0 0 100 100" fill="white"><rect x="15" y="15" width="70" height="70"/></svg>
+      </button>
+    </div>
+
+    <!-- SUBMITTED -->
+    <div class="player-feedback" id="state-submitted" style="display:none;">
+      <div style="font-size:3.5rem;">⌛</div>
+      <div class="feedback-title" data-i18n="playerSent">✓ Enviada</div>
+      <p class="subtitle" data-i18n="playerSentSub">Esperando…</p>
+    </div>
+
+    <!-- RESULT -->
+    <div class="player-feedback" id="state-result" style="display:none;">
+      <div id="result-icon" style="font-size:4rem;">✅</div>
+      <div class="feedback-title" id="result-title"></div>
+      <div class="feedback-points" id="result-points"></div>
+      <span class="subtitle" id="result-rank-info"></span>
+    </div>
+
+    <!-- LEADERBOARD WAIT -->
+    <div class="player-feedback" id="state-leaderboard-wait" style="display:none;">
+      <div style="font-size:3.5rem;" data-i18n="playerLb">📊</div>
+      <p class="subtitle" data-i18n="playerLbSub">Mira la pantalla</p>
+    </div>
+
+    <!-- PODIUM -->
+    <div class="player-feedback" id="state-podium" style="display:none;">
+      <div id="podium-icon" style="font-size:4rem;">🏆</div>
+      <div class="feedback-title" id="podium-title"></div>
+      <span class="subtitle" id="podium-rank"></span>
+      <button class="btn btn-accent" onclick="window.location.href='/'" style="margin-top:12px;" data-i18n="playerHome">🏠</button>
+    </div>
+
+    <!-- CONNECTION LOST -->
+    <div id="connection-lost" class="connection-lost" style="display:none;">
+      <div style="font-size:3rem;">📡</div>
+      <h2 data-i18n="playerDisconnected">Desconectado</h2>
+      <button class="btn btn-accent" onclick="window.location.href='/'" style="width:auto;padding:12px 24px;" data-i18n="playerReconnect">🏠</button>
+    </div>
+
+  </div>
+
+  <script src="/js/i18n.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>

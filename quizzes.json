@@ -1,0 +1,131 @@
+[
+  {
+    "id": "quiz-trivia-general",
+    "title": "🧠 Super Trivia General",
+    "description": "Demuestra quién es el más listo del grupo",
+    "questions": [
+      {
+        "id": "q10",
+        "question": "¿Cuál es el planeta más grande del sistema solar?",
+        "timeLimit": 20,
+        "options": [
+          "Saturno",
+          "Júpiter",
+          "Neptuno",
+          "Tierra"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "id": "q11",
+        "question": "¿En qué año se fundó la plataforma YouTube?",
+        "timeLimit": 20,
+        "options": [
+          "2003",
+          "2005",
+          "2007",
+          "2010"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "id": "q12",
+        "question": "¿Qué elemento químico tiene el símbolo 'Au'?",
+        "timeLimit": 15,
+        "options": [
+          "Plata",
+          "Aluminio",
+          "Oro",
+          "Argón"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": "q13",
+        "question": "¿Cuántos corazones tiene un pulpo?",
+        "timeLimit": 20,
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "quiz-tech-geek",
+    "title": "💻 Cultura Tech y Programación",
+    "description": "Desafío de código y tecnología para desarrolladores",
+    "questions": [
+      {
+        "id": "qt1",
+        "question": "¿Qué lenguaje de programación se ejecuta nativamente en los navegadores web?",
+        "timeLimit": 15,
+        "options": [
+          "Python",
+          "Java",
+          "JavaScript",
+          "C++"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": "qt2",
+        "question": "¿Qué protocolo se utiliza para conexiones WebSocket en tiempo real en web?",
+        "timeLimit": 20,
+        "options": [
+          "HTTP/2",
+          "ws:// o wss://",
+          "FTP",
+          "SMTP"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "id": "qt3",
+        "question": "¿Quién creó el sistema de control de versiones Git y el kernel de Linux?",
+        "timeLimit": 15,
+        "options": [
+          "Steve Jobs",
+          "Guido van Rossum",
+          "Linus Torvalds",
+          "Bill Gates"
+        ],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "quiz-memes-pop",
+    "title": "🎉 Memes y Cultura Pop",
+    "description": "¿Qué tan bien conoces los momentos virales de internet?",
+    "questions": [
+      {
+        "id": "qm1",
+        "question": "¿Cuál es la bebida de los dioses aztecas?",
+        "timeLimit": 15,
+        "options": [
+          "Tequila",
+          "Mezcal",
+          "Pulque",
+          "Tepache"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": "qm2",
+        "question": "¿Qué día se celebra el Día Internacional de Star Wars ('May the 4th be with you')?",
+        "timeLimit": 15,
+        "options": [
+          "4 de Mayo",
+          "14 de Marzo",
+          "25 de Mayo",
+          "4 de Junio"
+        ],
+        "correctIndex": 0
+      }
+    ]
+  }
+]
