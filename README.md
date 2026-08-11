@@ -33,7 +33,7 @@ Todo corre en tu red Wi-Fi. Cero cuentas. Cero rastreo. Cero dependencia de inte
 ## ⚡ Inicio rápido
 
 ```bash
-git clone https://github.com/tu-usuario/piku.git
+git clone https://github.com/obeskay/piku.git
 cd piku
 npm install
 npm start
